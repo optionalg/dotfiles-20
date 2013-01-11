@@ -1,1 +1,1 @@
-../.bin/goto-tool-repo/goto.bash
+../vendor/goto-tool/goto.bash
