@@ -9,7 +9,7 @@ function abort {
 }
 
 SOURCE=~/.dotfiles
-TARGET=~/test
+TARGET=~/
 
 # Make sure paths have a slash at the end
 [[ $SOURCE != */ ]] && SOURCE="$SOURCE"/
@@ -22,7 +22,7 @@ cd $SOURCE ||
     abort "Source directory does not exist."
 
 # Find
-FILES=$(find `pwd` -depth 1 -name ".*")
+FILES=$(find `pwd` -depth 1 -name ".*" -not -iname ".git")
 for file in $FILES; do
     target_file="$TARGET$(basename $file)"
 
