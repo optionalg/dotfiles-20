@@ -1,0 +1,3 @@
+[submodule "vendor/goto-tool"]
+	path = vendor/goto-tool
+	url = git://github.com/githubnemo/goto-tool.git
