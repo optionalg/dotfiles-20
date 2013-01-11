@@ -1,3 +1,6 @@
 [submodule "vendor/goto-tool"]
 	path = vendor/goto-tool
 	url = git://github.com/githubnemo/goto-tool.git
+[submodule ".scm_breeze"]
+	path = .scm_breeze
+	url = git://github.com/ndbroadbent/scm_breeze.git
