@@ -23,7 +23,7 @@ puts "-> About to move plugin '#{oldDir}' to '#{newDir}'."
 puts "Dry run!" if dryRun
 
 sedParams = dryRun ? "" : "-i .sedbak"
-%x[find . -type f | xargs sed #{sedParams} 's/#{oldDir}/#{newDir}/g']
+%x[find . -type f -name "*.php" -or -name "*.sql" -or -name "*.xml" | xargs sed #{sedParams} 's/#{oldDir}/#{newDir}/g']
 
 
 
