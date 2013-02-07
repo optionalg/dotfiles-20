@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Some more iTerm2 commands worth looking into:
+# http://scottlab.ucsc.edu/xtal/iterm_tab_customization.html
+
 # Sets up a 2x2 or 2x1 split pane setup in iTerm2
 #
 # Author: Lucas Jenss <public@x3ro.de>
