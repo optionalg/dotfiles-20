@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Sends a single keystroke to the currently active iTerm
+# window. The keystroke definition must be in apple script
+# format, e.g.
+#
+#       iterm-keycode 123 using {command down, option down}
+#
+# Author: Lucas Jenss <public@x3ro.de>
+
+# Just for reference:
+#
+# key code 123 -- left arrow Key
+# key code 124 -- right arrow Key
+# key code 126 -- up arrow Key
+# key code 125 -- down arrow Key
+
+osascript <<-eof
+    tell application "System Events" to tell process "iTerm" to key code ${@}
+eof

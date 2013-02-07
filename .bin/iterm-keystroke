@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Sends a single keystroke to the currently active iTerm
+# window. The keystroke definition must be in apple script
+# format, e.g.
+#
+#       iterm-keystroke "d" using {command down, shift down}
+#
+# http://stackoverflow.com/questions/8027146
+#
+# Author: Lucas Jenss <public@x3ro.de>
+
+osascript <<-eof
+    tell application "System Events" to tell process "iTerm" to keystroke "$1" ${@:2}
+eof

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Executes a single command in the currently active terminal, e.g.
+#
+#       iterm-exec echo 'lol'
+#
+# Author: Lucas Jenss <public@x3ro.de>
+
+osascript <<-eof
+    tell application "iTerm"
+        tell the front terminal
+            activate current session
+            tell the current session
+                write text "$@"
+            end tell
+        end tell
+    end tell
+eof

@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Sets up a 2x2 or 2x1 split pane setup in iTerm2
+#
+# Author: Lucas Jenss <public@x3ro.de>
+#
+# PS: Yes, I could've done this in a single apple script, but since I don't
+#     like apple script I've written some terminal commands I'll be able to use
+#     in the future, without ever having to touch AS.
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+create_2x2 () {
+    # Split vertically
+    iterm-keystroke "d" using command down
+    iterm-exec iterm-tabname $1
+
+    # Split right pane horizontally
+    iterm-keystroke "d" using {command down, shift down}
+    iterm-exec iterm-tabname $1
+
+    # Navigate back to left pane
+    iterm-keycode 123 using {command down, option down}
+
+    # And split the left pane horizontally
+    iterm-keystroke "d" using {command down, shift down}
+    iterm-exec iterm-tabname $1
+
+    # Navigate back to the pane where we started, and name it
+    iterm-keycode 126 using {command down, option down}
+    iterm-exec iterm-tabname $1
+}
+
+create_2x1 () {
+    # Split vertically
+    iterm-keystroke "d" using command down
+    iterm-exec iterm-tabname $1
+
+    # Navigate back to left pane, and name it
+    iterm-keycode 123 using {command down, option down}
+    iterm-exec iterm-tabname $1
+}
+
+USAGE="Usage: tabsetup [mode] [tab name], where mode is 2x1 or 2x2"
+
+[ "$#" -eq 2 ] || die "$USAGE"
+
+case "$1" in
+    2x1) create_2x1 $2
+    ;;
+
+    2x2) create_2x2 $2
+    ;;
+
+    *) die "$USAGE"
+    ;;
+esac
