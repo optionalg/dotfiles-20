@@ -1,0 +1,5 @@
+#!/bin/bash
+# Set the name of the current iterm tab
+# Source: http://www.leftontheweb.com/message/Setting_iTerm_tab_names
+echo -ne "\033]0;$@\007"
+
