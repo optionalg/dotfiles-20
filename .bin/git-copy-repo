@@ -1,0 +1,240 @@
+#!/usr/bin/env ruby
+
+require 'rainbow'
+
+module Messenger
+  def format(x)
+    "#{prefix}#{x}"
+  end
+
+  def msg(x)
+    puts format(x)
+  end
+
+  def success(x, y="")
+    puts format(x).color(:green) + y
+  end
+
+  def notice(x, y="")
+    puts format(x).color(:yellow) + y
+  end
+
+  def fail(x, y="")
+    puts format(x).color(:red) + y
+  end
+
+  # Overwrite these in your importing class
+  def prefix; raise NotImplementedError; end
+end
+
+class ChainFailedError < Exception
+  attr_reader :chain, :description
+  def initialize(chain, description)
+    @chain = chain
+    @description = description
+  end
+end
+
+class CmdFailedError < Exception; end
+class UnmetDemandError < Exception;
+  attr_reader :demand
+  def initialize(demand); @demand = demand; end
+end
+
+class Chain
+  include Messenger
+
+  def self.which(task, &block)
+    c = self.new(task)
+    c.instance_exec(&block)
+    c
+  end
+
+
+  def initialize(task)
+    @task = task
+    @cmd_list = []
+  end
+
+
+  def go(desc, &block)
+    add_command(desc, block)
+  end
+
+  def run(args = {})
+    notice "About to run command chain: " + @task
+
+    @cmd_list.each_with_index do |cmd, index|
+      desc, proc = cmd
+      success "#{timestamp} // Running chain link ##{index+1} - #{desc}"
+
+      error = false
+      begin
+        ret, out = Cmd.invoke(proc, args)
+      rescue CmdFailedError => e
+        error = true
+      end
+      raise ChainFailedError.new(index + 1, desc) if ret == false || error == true
+
+
+      # Pass the arguments from the last iteration, overwriting everything that
+      # was passed from the current one.
+      args.merge! out
+    end
+
+  rescue ChainFailedError => e
+    fail("Chain link ##{e.chain} (#{e.description}) failed. Aborting.")
+    false
+  end
+
+private
+
+  def timestamp
+    Time.now.strftime('%H:%M:%S.%L')
+  end
+
+  def prefix; "=> "; end
+
+  def add_command(desc, cmd)
+    raise "Parameter must be a Proc/Lambda" if !cmd.is_a?(Proc)
+    @cmd_list.push [desc, cmd]
+  end
+end
+
+
+class Cmd
+  include Messenger
+
+  def self.invoke(proc, args)
+    self.new(args).invoke(proc)
+  end
+
+  def initialize(args)
+    @in_args = args
+    @out_args = {}
+  end
+
+  def invoke(proc)
+    ret = instance_exec(&proc)
+    [ret, @out_args]
+
+  rescue UnmetDemandError => e
+    fail "Required argument '#{e.demand}', but was not given."
+    raise CmdFailedError.new
+  rescue CmdFailedError => e
+    fail e.message
+    raise e
+  end
+
+
+
+  # ==========
+  # Public API
+  # ==========
+
+  def run(cmd)
+    notice "Running: " + cmd.color(:white)
+
+    out = ""
+    IO.popen("#{cmd} 2>&1") do |f|
+      while l = f.gets
+        out += l
+        puts "        " + l
+      end
+    end
+    #puts out.split("\n").map { |line| "        " + line }.join("\n")
+    #out = %x[#{cmd}]
+
+    #puts tmp_out.read() # print out what was sent to STDOUT
+    raise CmdFailedError.new("Command '#{cmd}' had exit status != 0.") if $? != 0
+    out
+  end
+
+
+  # Passes an argument onto the next link of the chain
+  def pass(key, value)
+    @out_args[key] = value
+  end
+
+  # Requires that an argument must be present before proceeding in the current
+  # chain
+  def demand(*keys)
+    keys.each do |key|
+      raise UnmetDemandError.new(key) if !@in_args.has_key? key
+    end
+  end
+
+  def method_missing(method, *args, &block)
+    if method.to_s =~ /^_(.+)$/
+      arg = @in_args[$1.to_sym]
+      return arg if !arg.nil?
+    end
+
+    super
+  end
+
+
+
+  # Messenger module related
+  def prefix; "    => "; end
+end
+
+
+abort("Usage: git-copy-repo <source repo> <target repo>") if ARGV.length != 2
+
+c = Chain.which("copies a git repository") do
+
+  go "Clone git repository" do
+    demand :source, :tmpdir
+    run "git clone #{_source} #{_tmpdir}"
+  end
+
+  go "Chdir to temporary directory" do
+    demand :tmpdir
+    pass :old_dir, Dir.pwd
+    Dir.chdir _tmpdir
+  end
+
+  go "Find out which remote branches need to be checked out" do
+    branches = run "git branch -r"
+    branches = branches.split("\n")
+      .select { |x| !x.include? "->" }
+      .select { |x| !x.include? "/master" }
+      .select { |x| x.include? 'origin/' }
+      .map { |x| x.strip }
+
+    notice "Will check out these branches:", " #{branches.join(" ")}"
+    pass :branches, branches
+  end
+
+  go "Check out the remote branches" do
+    _branches.each do |branch|
+      run "git checkout --track #{branch}"
+    end
+  end
+
+  go "Add target remote to repository" do
+    demand :target
+    run "git remote add new #{_target}"
+  end
+
+  go "Push data to target repository" do
+    run "git push --all new"
+  end
+
+  go "Push tags to target repository" do
+    run "git push --tags new"
+  end
+
+  go "Delete temporary directory" do
+    demand :old_dir, :tmpdir
+    Dir.chdir _old_dir
+    run "rm -rf #{Dir.pwd}/#{_tmpdir}"
+  end
+
+end
+
+c.run({:source => ARGV[0], :target => ARGV[1], :tmpdir => "tmp/"})
+
+
+
