@@ -36,3 +36,19 @@ for file in $FILES; do
     ln -s $file $target_file
 done
 
+
+
+#
+# Install phpsh if not yet installed
+#
+
+echo ""
+PHPSH_SOURCE="${SOURCE}vendor/phpsh/"
+PHPSH_TARGET="${SOURCE}installed/phpsh/"
+if [[ -e "$PHPSH_TARGET" ]]; then
+    echo "phpsh is already installed in $PHPSH_TARGET. Skipping..."
+else
+    echo "About to install phpsh into $PHPSH_TARGET"
+    CMD="cd $PHPSH_SOURCE && python setup.py install --prefix=${PHPSH_TARGET}"
+    eval "$CMD"
+fi
