@@ -5,7 +5,7 @@ alias httpd="python -m SimpleHTTPServer 8081"
 
 # Debugging SMTP server
 # Found here: http://www.vurt.ru/2013/02/python-command-line-oneliners/
-alias smtpd="echo 'Starting debug SMTPD on port 25000' && sudo python -m smtpd -n -c DebuggingServer localhost:25000"
+alias smtpd="echo 'Starting debug SMTPD on port 25000' && python -m smtpd -n -c DebuggingServer localhost:25000"
 
 # ===========
 # Git aliases
