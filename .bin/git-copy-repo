@@ -180,8 +180,6 @@ class Cmd
 end
 
 
-abort("Usage: git-copy-repo <source repo> <target repo>") if ARGV.length != 2
-
 c = Chain.which("copies a git repository") do
 
   go "Clone git repository" do
@@ -234,7 +232,27 @@ c = Chain.which("copies a git repository") do
 
 end
 
-c.run({:source => ARGV[0], :target => ARGV[1], :tmpdir => "tmp/"})
+
+# Specify repos to be copied in a file
+if File.exists?(ARGV[0])
+  contents = File.read(ARGV[0])
+  lines = contents.split("\n")
+
+  repos = []
+  lines.each_with_index do |line, num|
+    x = line.split(" -> ")
+    raise "Line #{num+1} not in format 'source_repo -> target_repo'" if x.length != 2
+    repos.push({:source => x[0].strip, :target => x[1].strip})
+  end
+
+  repos.each do |repo|
+    c.run({:source => repo[:source], :target => repo[:target], :tmpdir => "tmp/"})
+  end
+
+else
+  abort("Usage: git-copy-repo <source repo> <target repo>") if ARGV.length != 2
+  c.run({:source => ARGV[0], :target => ARGV[1], :tmpdir => "tmp/"})
+end
 
 
 
