@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+
+require 'automate'
+
+$php_path = "/Applications/MAMP/bin/php/php5.3.14/bin/php"
+$phpini_path = "/Library/Application Support/appsolute/MAMP PRO/conf/php.ini"
+
+c = Automate::Chain.which("Runs a TYPO3 unit test") do
+
+  go "Check if target extension exists" do
+    demand :ext_path
+    error "Path '#{_ext_path}' not found!" if !File.exists?(_ext_path)
+  end
+
+  go "Check if config.xml exists" do
+    config_path = "#{_ext_path}/Tests/config.xml"
+    error "Config file at '#{config_path}' not found!" if !File.exists?(config_path)
+    pass :config_path, config_path
+  end
+
+  go "Find cli_dispatch.phpsh" do
+    pwd = Dir.pwd
+    while !File.exists? "#{pwd}/typo3"
+      new_pwd = File.expand_path("..", pwd)
+      error "Could not find 'typo3' dir. Did you run the command from within a TYPO3 project?" if pwd == new_pwd
+      pwd = new_pwd
+    end
+    pass :typo3_root, pwd
+  end
+
+  go "Run unit test" do
+    pass :coverage_path, "#{_ext_path}/coverage"
+
+    cmd = []
+    cmd << "#{$php_path}"
+    cmd << "-c '#{$phpini_path}'"
+    cmd << "#{_typo3_root}/typo3/cli_dispatch.phpsh phpunit"
+    cmd << "--coverage-html #{_coverage_path}"
+    cmd << "--configuration #{_config_path}"
+    cmd << "#{_ext_path}"
+    run cmd.join(' ')
+  end
+
+  go "Open the coverage html" do
+    run "open #{_coverage_path}/index.html"
+  end
+
+end
+
+abort "Usage: t3-phpunit <path-to-extension>" if ARGV.length != 1
+c.run({:ext_path => ARGV[0]})
+
