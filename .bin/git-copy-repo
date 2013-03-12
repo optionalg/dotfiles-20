@@ -193,11 +193,17 @@ c = Chain.which("copies a git repository") do
     Dir.chdir _tmpdir
   end
 
+  go "Get default (master) branch" do
+    pass :default_branch, run("git rev-parse --abbrev-ref HEAD").strip
+  end
+
   go "Find out which remote branches need to be checked out" do
+    notice "Default branch: '#{_default_branch}'"
+
     branches = run "git branch -r"
     branches = branches.split("\n")
       .select { |x| !x.include? "->" }
-      .select { |x| !x.include? "/master" }
+      .select { |x| !x.include? "/#{_default_branch}" }
       .select { |x| x.include? 'origin/' }
       .map { |x| x.strip }
 
@@ -234,7 +240,7 @@ end
 
 
 # Specify repos to be copied in a file
-if File.exists?(ARGV[0])
+if File.exists?(ARGV[0]) && !File.directory?(ARGV[0])
   contents = File.read(ARGV[0])
   lines = contents.split("\n")
 
