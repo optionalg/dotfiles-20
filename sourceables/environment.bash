@@ -1,8 +1,9 @@
 MAMP="/Applications/MAMP/Library/bin"
 DOTFILES="~/.dotfiles/.bin"
 NPM="/usr/local/share/npm/bin"
+BREW="/usr/local/bin"
 
-PATH="$PATH:$MAMP:$DOTFILES:$NPM"
+PATH="$BREW:$PATH:$MAMP:$DOTFILES:$NPM"
 export PATH
 
 EDITOR="vim"
