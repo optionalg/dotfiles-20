@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "" == "$1" ]]; then
+    echo "Usage: permfix <files/directories>";
+    exit 1;
+fi
+
+find $1 \( ! -regex '.*/\..*' \) -type d -exec chmod 755 {} \;
+find $1 \( ! -regex '.*/\..*' \) -type f | xargs chmod 644
