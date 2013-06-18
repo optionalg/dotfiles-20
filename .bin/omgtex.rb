@@ -18,6 +18,10 @@ optparse = OptionParser.new do|opts|
 		options[:bibtex] = true
 	end
 
+	opts.on('-e', '--shell-escape', 'Shell escape-ish') do
+		options[:latexOptions].push("-shell-escape")
+	end
+
 	opts.on('-h', '--help', 'Display this message') do
 		puts opts
 		exit
