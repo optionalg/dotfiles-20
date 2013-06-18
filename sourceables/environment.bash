@@ -14,6 +14,8 @@ PHPSH_LIB_PATH=~/.dotfiles/installed/phpsh/lib/python2.7/site-packages
 PYTHONPATH="${PHPSH_LIB_PATH}:$PYTHONPATH"
 export PYTHONPATH
 
+export DYLD_LIBRARY_PATH="/usr/local/Cellar/mysql/5.6.10/lib:$DYLD_LIBRARY_PATH"
+
 # Fix those pesky perl warnings on remote servers, which is caused
 # by us sending weird locale settings
 export LC_CTYPE=en_US.UTF-8
