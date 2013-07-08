@@ -11,7 +11,8 @@ EDITOR="vim"
 export EDITOR
 
 PHPSH_LIB_PATH=~/.dotfiles/installed/phpsh/lib/python2.7/site-packages
-PYTHONPATH="${PHPSH_LIB_PATH}:$PYTHONPATH"
+HOMEBREW_PYTHON=$(brew --prefix)/lib/python2.7/site-packages
+PYTHONPATH="${PHPSH_LIB_PATH}:$HOMEBREW_PYTHON:$PYTHONPATH"
 export PYTHONPATH
 
 export DYLD_LIBRARY_PATH="/usr/local/Cellar/mysql/5.6.10/lib:$DYLD_LIBRARY_PATH"
