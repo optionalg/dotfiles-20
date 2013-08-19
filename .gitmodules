@@ -7,3 +7,6 @@
 [submodule "vendor/phpsh"]
 	path = vendor/phpsh
 	url = git://github.com/facebook/phpsh.git
+[submodule ".pyenv"]
+	path = .pyenv
+	url = git://github.com/yyuu/pyenv.git

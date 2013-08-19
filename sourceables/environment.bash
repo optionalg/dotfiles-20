@@ -3,8 +3,10 @@ DOTFILES="~/.dotfiles/.bin"
 NPM="/usr/local/share/npm/bin"
 BREW="/usr/local/bin"
 GO="/Users/lucas/_dev/_go/bin"
+PYENV="$HOME/.pyenv/bin"
 
-PATH="$BREW:$PATH:$MAMP:$DOTFILES:$NPM:$GO"
+
+PATH="$PYENV:$BREW:$PATH:$MAMP:$DOTFILES:$NPM:$GO"
 export PATH
 
 EDITOR="vim"
