@@ -17,6 +17,13 @@ HOMEBREW_PYTHON=$(brew --prefix)/lib/python2.7/site-packages
 PYTHONPATH="${PHPSH_LIB_PATH}:$HOMEBREW_PYTHON:$PYTHONPATH"
 export PYTHONPATH
 
+# Android
+export PATH=$PATH:~/_dev/_adt/sdk/tools
+export PATH=$PATH:~/_dev/_adt/sdk/platform-tools
+export PATH=$PATH:~/_dev/_adt/ndk/
+export ANDROID_HOME=~/_dev/_adt/sdk
+export ANDROID_NDK=~/_dev/_adt/ndk
+
 export DYLD_LIBRARY_PATH="/usr/local/Cellar/mysql/5.6.10/lib:$DYLD_LIBRARY_PATH"
 
 # Fix those pesky perl warnings on remote servers, which is caused
